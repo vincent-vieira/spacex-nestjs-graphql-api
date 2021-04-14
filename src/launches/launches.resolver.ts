@@ -1,44 +1,46 @@
 import { Injectable } from '@nestjs/common';
-import { LaunchAPI } from '../datasources/launch';
+import { LaunchesAPI } from '../datasources/launch';
 import { Query, Args, Resolver, ResolveField, Parent } from '@nestjs/graphql';
 import { Launch, Launches } from './launch.model';
 import { Mission } from '../missions/mission.model';
-import { RocketAPI } from '../datasources/rocket';
+import { RocketsAPI } from '../datasources/rocket';
 import { Rocket } from '../rockets/rocket.model';
 
 @Resolver(() => Launch)
 @Injectable()
 export class LaunchResolver {
   constructor(
-    private readonly launchAPI: LaunchAPI,
-    private readonly rocketsAPI: RocketAPI,
+    private readonly launchAPI: LaunchesAPI,
+    private readonly rocketsAPI: RocketsAPI,
   ) {}
 
   @Query(() => [Launch], { name: 'launches' })
-  async getLaunches(): Promise<Launches> {
-    return this.launchAPI.getAllLaunches();
+  async findAll(): Promise<Launches> {
+    return this.launchAPI.findAll();
   }
 
   @Query(() => Launch, { name: 'launch' })
-  async getLaunch(@Args('id') id: string) {
-    return await this.launchAPI.getLaunchById({ launchId: id });
+  async findOne(@Args('id') id: string) {
+    return await this.launchAPI.findOne({ launchId: id });
   }
 
   @Query(() => [Launch], { name: 'launchesByIds' })
-  async getLaunchesByIds(
+  async findSome(
     @Args({ name: 'ids', type: () => [String] }) launchIds: string[],
   ): Promise<Launches> {
-    return this.launchAPI.getLaunchesByIds({ launchIds });
+    return this.launchAPI.findSome({ launchIds });
   }
 
   @ResolveField('mission', () => Mission)
   getMission(@Parent() { mission }: Launch) {
+    // This is statically resolved, the mission's already constructed from the datasource
     return mission;
   }
 
   @ResolveField('rocket', () => Rocket)
-  getRocket(@Parent() { rocket }: Launch) {
-    return rocket;
-    //return await this.rocketsAPI.getRocket(`${id}`);
+  async getRocket(@Parent() { rocket: { id } }: Launch) {
+    // This is dynamically resolved, the rocket's only know data is its id, and another query must be made in order to aggregate more data
+    // Careful ! This can be very inefficient with large data sets
+    return await this.rocketsAPI.findOne(id);
   }
 }

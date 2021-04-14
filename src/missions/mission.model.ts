@@ -1,13 +1,13 @@
-import { Field, ObjectType } from "@nestjs/graphql";
+import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class Mission {
-  @Field({ nullable: true })
+  @Field()
   name: string;
 
-  @Field({ nullable: true })
+  @Field()
   missionPatchSmall: string;
 
-  @Field({ nullable: true })
+  @Field()
   missionPatchLarge: string;
 }

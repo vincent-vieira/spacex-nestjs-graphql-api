@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { RocketAPI } from '../datasources/rocket';
+import { RocketsAPI } from '../datasources/rocket';
 
 @Module({
-  providers: [RocketAPI],
-  exports: [RocketAPI],
+  providers: [RocketsAPI],
+  exports: [RocketsAPI],
 })
 export class RocketsModule {}

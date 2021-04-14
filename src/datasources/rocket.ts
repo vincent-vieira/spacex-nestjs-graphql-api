@@ -1,19 +1,23 @@
-import { RESTDataSource } from "apollo-datasource-rest";
-import { Rocket } from "../rockets/rocket.model";
+import { RESTDataSource } from 'apollo-datasource-rest';
+import { Rocket } from '../rockets/rocket.model';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Environment } from '../environment.module';
 
-export class RocketAPI extends RESTDataSource {
-  constructor() {
+@Injectable()
+export class RocketsAPI extends RESTDataSource {
+  constructor(configService: ConfigService<Environment>) {
     super();
-    this.baseURL = 'https://api.spacexdata.com/v2';
+    this.baseURL = configService.get('SPACEX_URL');
     this.initialize({} as any);
   }
 
-  async getRocket(rocketId: string): Promise<Rocket> {
+  async findOne(rocketId: string): Promise<Rocket> {
     const response = await this.get(`rockets/${rocketId}`);
-    return this.toRocket(response);
+    return this.convertToRocket(response);
   }
 
-  private toRocket(response): Rocket {
+  private convertToRocket(response): Rocket {
     return {
       id: response.id,
       name: response.name,

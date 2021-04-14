@@ -1,33 +1,35 @@
 import { RESTDataSource } from 'apollo-datasource-rest';
 import { Launch, Launches } from '../launches/launch.model';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Environment } from '../environment.module';
 
-export class LaunchAPI extends RESTDataSource {
-  constructor() {
+@Injectable()
+export class LaunchesAPI extends RESTDataSource {
+  constructor(configService: ConfigService<Environment>) {
     super();
-    this.baseURL = 'https://api.spacexdata.com/v2/';
+    this.baseURL = configService.get('SPACEX_URL');
     this.initialize({} as any);
   }
 
-  async getAllLaunches(): Promise<Launches> {
+  async findAll(): Promise<Launches> {
     const response = await this.get('launches');
     return Array.isArray(response)
-      ? response.map((response) => this.toLauncher(response))
+      ? response.map((response) => this.convertToLauncher(response))
       : [];
   }
 
-  async getLaunchById({ launchId }): Promise<Launch> {
+  async findOne({ launchId }): Promise<Launch> {
     const response = await this.get('launches', { flight_number: launchId });
-    return this.toLauncher(response[0]);
+    return this.convertToLauncher(response[0]);
   }
 
-  async getLaunchesByIds({ launchIds }): Promise<Launches> {
-    return Promise.all(
-      launchIds.map((launchId) => this.getLaunchById({ launchId })),
-    );
+  async findSome({ launchIds }): Promise<Launches> {
+    return Promise.all(launchIds.map((launchId) => this.findOne({ launchId })));
   }
 
-  private toLauncher(launch): Launch {
-    const result = {
+  private convertToLauncher(launch): Launch {
+    return {
       id: launch.flight_number || 0,
       cursor: `${launch.launch_date_unix}`,
       site: launch.launch_site && launch.launch_site.site_name,
@@ -38,12 +40,7 @@ export class LaunchAPI extends RESTDataSource {
       },
       rocket: {
         id: launch.rocket.rocket_id,
-        name: launch.rocket.rocket_name,
-        stages: 0,
       },
     };
-    console.log(launch);
-
-    return result;
   }
 }

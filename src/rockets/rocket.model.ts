@@ -1,13 +1,13 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class Rocket {
-  @Field()
+  @Field(() => ID)
   id: string;
 
   @Field({ nullable: true })
-  name: string;
+  name?: string;
 
-  @Field(() => Int, { nullable: false })
-  stages: number;
+  @Field(() => Int, { nullable: true })
+  stages?: number;
 }

@@ -1,24 +1,23 @@
-import { Field, Int, ObjectType } from "@nestjs/graphql";
-import { Mission } from "../missions/mission.model";
-import { Rocket } from "../rockets/rocket.model";
+import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Mission } from '../missions/mission.model';
+import { Rocket } from '../rockets/rocket.model';
 
 @ObjectType()
 export class Launch {
-
-  @Field(() => Int)
+  @Field(() => ID)
   id: number;
 
-  @Field({ nullable: true })
+  @Field()
   site: string;
 
-  @Field({ nullable: true })
+  @Field()
   cursor: string;
 
-  @Field({ nullable: true })
+  @Field()
   mission: Mission;
 
   @Field({ nullable: true })
-  rocket: Rocket;
+  rocket?: Rocket;
 }
 
 export type Launches = Array<Launch>;
