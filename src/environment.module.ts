@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { IsString, validateSync } from 'class-validator';
+import { IsString, validateSync, IsBoolean } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 
 export class Environment {
   @IsString()
   SPACEX_URL: string;
+
+  @IsBoolean()
+  IS_DEV: boolean;
 }
 
 function validate(config: Record<string, unknown>) {

@@ -31,8 +31,10 @@ export class LaunchesAPI extends RESTDataSource {
   private convertToLauncher(launch): Launch {
     return {
       id: launch.flight_number || 0,
-      cursor: `${launch.launch_date_unix}`,
-      site: launch.launch_site && launch.launch_site.site_name,
+      cursor: launch.launch_date_unix,
+      launchPad: {
+        id: launch?.launch_site?.site_id,
+      },
       mission: {
         name: launch.mission_name,
         missionPatchSmall: launch.links.mission_patch_small,
