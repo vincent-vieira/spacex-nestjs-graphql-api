@@ -1,0 +1,34 @@
+image: node:lts
+
+stages:
+  - lint
+  - build
+  - test
+
+cache:
+  paths:
+    - node_modules/
+    - .yarn
+
+Install dependencies:
+  stage: .pre
+  script:
+    - yarn config set cache-folder .yarn
+    - yarn install
+
+Lint files:
+  stage: lint
+  script:
+    - yarn run lint
+
+Build:
+  stage: build
+  before_script:
+    - yarn config set cache-folder .yarn
+  script:
+    - yarn run build
+
+Test:
+  stage: test
+  script:
+    - yarn run test
